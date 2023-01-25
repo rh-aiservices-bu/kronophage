@@ -1,0 +1,18 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: nightly-killer
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: nightly-killer
+              image: openshift/origin-cli
+              command:
+                - "sh"
+                - "-c"
+                - "oc delete pods -n $(oc get ns -l opendatahub=yes -o jsonpath='{.items[*].metadata.name}') -l opendatahub=yes"
+          restartPolicy: OnFailure

@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stretcher
+spec:
+  ## Purposely commented out. To be controller either manually or via the scheduler cronjob
+  # replicas: 0
+  selector:
+    matchLabels:
+      name: stretcher
+  template:
+    metadata:
+      labels:
+        name: stretcher
+    spec:
+      initContainers:                                   ## this is the container that pre-pulls the image
+      - name: prepuller-init-container
+        image: 'registry.redhat.io/openshift4/ose-cli'     ## update if there is a new version of the image
+        # command: ['start-singleuser.sh', '--help']
+      containers:                                       ## this is the main container, that does nothing
+      - name: paused-container
+        image: gcr.io/google_containers/pause
+        ## match these resources to the size most commonly used
+        resources:
+          limits:
+              cpu: 1
+              memory: 4Gi
+          requests:
+              cpu: 100m
+              memory: 1Gi
+      tolerations:                  ## this lets notebooks go to nodes that have been tainted with "notebooksonly"
+      - key: "NotebooksOnly"
+        operator: "Exists"
+        effect: "NoSchedule"

@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: image-puller
+  labels:
+    k8s-app: image-puller
+spec:
+  selector:
+    matchLabels:
+      name: image-puller
+  template:
+    metadata:
+      labels:
+        name: image-puller
+    spec:
+      containers:
+      - name: image-puller
+        image: registry.redhat.io/openshift4/ose-cli
+        resources:
+          limits:
+            memory: 400Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
